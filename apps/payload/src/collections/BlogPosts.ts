@@ -11,8 +11,8 @@ import {
 } from './_shared'
 
 /**
- * Mirrors keukenfaqs-main src/content.config.ts `blog` schema so the sync
- * pipeline emits identical Markdown frontmatter.
+ * Blog posts synced to Astro markdown frontmatter (title, description, dates,
+ * images, excerpt, metaTitle, metaDescription, plus optional `extra` keys).
  */
 export const BlogPosts: CollectionConfig = {
   slug: 'blog-posts',

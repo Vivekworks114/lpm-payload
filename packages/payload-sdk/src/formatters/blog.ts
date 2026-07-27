@@ -28,6 +28,11 @@ interface BlogDoc {
   tags?: Array<{ value: string }> | null
   content: unknown
   extra?: Record<string, unknown> | null
+  /** Payload SEO group — mapped to metaTitle / metaDescription in frontmatter. */
+  seo?: {
+    title?: string | null
+    description?: string | null
+  } | null
 }
 
 export interface FormattedFile {
@@ -54,6 +59,10 @@ const RESERVED_FRONTMATTER_KEYS = new Set([
   'heroImage',
   'featuredImage',
   'excerpt',
+  'metaTitle',
+  'metaDescription',
+  'meta_title',
+  'meta_description',
   'categories',
   'tags',
   'slug',
@@ -98,6 +107,25 @@ export function formatBlogMarkdown(
     extraStringField(repo, 'excerpt') ??
     doc.description
   if (excerpt) frontmatter.excerpt = excerpt
+  // Many Astro blog schemas require metaTitle / metaDescription (not optional SEO).
+  const metaTitle =
+    extraStringField(extra, 'metaTitle') ??
+    extraStringField(extra, 'meta_title') ??
+    extraStringField(repo, 'metaTitle') ??
+    extraStringField(repo, 'meta_title') ??
+    (typeof doc.seo?.title === 'string' && doc.seo.title.trim() ? doc.seo.title.trim() : undefined) ??
+    doc.title
+  const metaDescription =
+    extraStringField(extra, 'metaDescription') ??
+    extraStringField(extra, 'meta_description') ??
+    extraStringField(repo, 'metaDescription') ??
+    extraStringField(repo, 'meta_description') ??
+    (typeof doc.seo?.description === 'string' && doc.seo.description.trim()
+      ? doc.seo.description.trim()
+      : undefined) ??
+    doc.description
+  if (metaTitle) frontmatter.metaTitle = metaTitle
+  if (metaDescription) frontmatter.metaDescription = metaDescription
   if (doc.categories?.length) {
     frontmatter.categories = doc.categories.map((c) => c.value).filter(Boolean)
   }
